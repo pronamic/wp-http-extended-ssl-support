@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<ruleset name="Additional SSL Options for WordPress HTTP API">
+	<file>.</file>
+
+	<exclude-pattern type="relative">^build/*</exclude-pattern>
+	<exclude-pattern type="relative">^vendor/*</exclude-pattern>
+
+	<rule ref="PronamicWP">
+
+	</rule>
+</ruleset>
