@@ -49,6 +49,10 @@ final class Plugin {
 	 * @return void
 	 */
 	public function setup() {
+		if ( \has_action( 'http_api_curl', [ $this, 'http_api_curl' ] ) ) {
+			return;
+		}
+
 		\add_action( 'http_api_curl', [ $this, 'http_api_curl' ], 10, 2 );
 	}
 
