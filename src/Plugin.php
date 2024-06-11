@@ -19,7 +19,7 @@ final class Plugin {
 	 * 
 	 * @var self
 	 */
-	private $instance;
+	private static $instance;
 
 	/**
 	 * Bootstrap.
