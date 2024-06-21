@@ -19,9 +19,9 @@ This library extends the WordPress HTTP API with additional SSL options. It prov
 \wp_remote_get(
 	$url,
 	[
-		'ssl_certificate_blob'   => '-----BEGIN CERTIFICATE-----', // Must be a full SSL certificate string.
-		'ssl_key_blob'           => '-----BEGIN ENCRYPTED PRIVATE KEY-----', // Must be a full SSL key string.
-		'ssl_key_password' => ' your-password', 
+		'ssl_certificate_blob' => '-----BEGIN CERTIFICATE-----', // Must be a full SSL certificate string.
+		'ssl_key_blob'         => '-----BEGIN ENCRYPTED PRIVATE KEY-----', // Must be a full SSL key string.
+		'ssl_key_password'     => ' your-password', 
 	]
 );
 ```
