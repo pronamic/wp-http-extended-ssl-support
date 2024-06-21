@@ -26,6 +26,10 @@ This library extends the WordPress HTTP API with additional SSL options. It prov
 );
 ```
 
+## TLS backends and cURL
+
+It is good to realize that PHP and cURL can work with different TLS backends. Not all TLS backends have support for all cURL SSL options. An overview of all cURL options and their support in the various TLS backends can be found at https://curl.se/libcurl/c/tls-options.html.
+
 ## Links
 
 - https://github.com/WordPress/Requests/issues/377
