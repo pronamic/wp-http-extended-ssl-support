@@ -213,7 +213,7 @@ final class Plugin {
 	private function set_ssl_key_password_option_if_needed( $handle, $parsed_args ) {
 		if ( \array_key_exists( 'ssl_key_password', $parsed_args ) ) {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt -- WordPress requests library does not support this yet.
-			\curl_setopt( $handle, \CURLOPT_SSLKEYPASSWD, $parsed_args['ssl_key_password'] );
+			\curl_setopt( $handle, \CURLOPT_KEYPASSWD, $parsed_args['ssl_key_password'] );
 		}
 	}
 }
