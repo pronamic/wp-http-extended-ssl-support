@@ -95,11 +95,12 @@ final class Plugin {
 	/**
 	 * Get temporary file.
 	 * 
-	 * @param string $content Content.
+	 * @param string         $content  Content.
+	 * @param Throwable|null $previous The previous exception used for the exception chaining.
 	 * @return string
 	 * @throws \Exception Throws an exception if creating a temporary file for the content fails.
 	 */
-	private function get_temporary_file( $content ) {
+	private function get_temporary_file( $content, $previous = null ) {
 		$hash = \md5( $content );
 
 		if ( ! \array_key_exists( $hash, $this->files ) ) {
@@ -107,7 +108,7 @@ final class Plugin {
 			$file = \tempnam( \get_temp_dir(), 'pronamic_curl_ssl' );
 
 			if ( false === $file ) {
-				$exception = new \Exception( 'Failed to create a temporary file for SSL BLOB data.', 0, $error );
+				$exception = new \Exception( 'Failed to create a temporary file for SSL BLOB data.', 0, $previous );
 
 				throw $exception;
 			}
@@ -116,7 +117,7 @@ final class Plugin {
 			$result = \file_put_contents( $file, $content );
 
 			if ( false === $result ) {
-				$exception = new \Exception( 'Failed to write SSL BLOB data to temporary file.', 0, $error );
+				$exception = new \Exception( 'Failed to write SSL BLOB data to temporary file.', 0, $previous );
 
 				throw $exception;
 			}
@@ -151,7 +152,7 @@ final class Plugin {
 				 * @link https://curl.se/libcurl/c/tls-options.html
 				 * @link https://github.com/pronamic/wp-http-extended-ssl-support/issues/1
 				 */
-				$parsed_args['ssl_certificate'] = $this->get_temporary_file( $parsed_args['ssl_certificate_blob'] );
+				$parsed_args['ssl_certificate'] = $this->get_temporary_file( $parsed_args['ssl_certificate_blob'], $error );
 
 				$this->set_ssl_certificate_option_if_needed( $handle, $parsed_args );
 			}
@@ -190,7 +191,7 @@ final class Plugin {
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt -- WordPress requests library does not support this yet.
 				\curl_setopt( $handle, \CURLOPT_SSLKEY_BLOB, $parsed_args['ssl_key_blob'] );
 			} catch ( \ValueError $error ) {                
-				$parsed_args['ssl_key'] = $this->get_temporary_file( $parsed_args['ssl_key_blob'] );
+				$parsed_args['ssl_key'] = $this->get_temporary_file( $parsed_args['ssl_key_blob'], $error );
 
 				$this->set_ssl_key_option_if_needed( $handle, $parsed_args );
 			}
