@@ -100,7 +100,7 @@ final class Plugin {
 				 */
 
 				// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_tempnam -- Recommended function `get_temp_dir()` is used.
-				$file = \tempnam( \get_temp_dir(), 'pronamic_curl_sslcert_blob' );
+				$file = \tempnam( \get_temp_dir(), 'pronamic_curl_ssl_certificate' );
 
 				if ( false === $file ) {
 					$exception = new \Exception( 'Failed to create a temporary file for SSL certificate BLOB.', 0, $error );
@@ -165,7 +165,7 @@ final class Plugin {
 				 */
 
 				// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_tempnam -- Recommended function `get_temp_dir()` is used.
-				$file = \tempnam( \get_temp_dir(), 'pronamic_curl_sslkey_blob' );
+				$file = \tempnam( \get_temp_dir(), 'pronamic_curl_ssl_key' );
 
 				if ( false === $file ) {
 					$exception = new \Exception( 'Failed to create temporary file for SSL key BLOB.', 0, $error );
