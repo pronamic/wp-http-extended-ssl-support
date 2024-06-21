@@ -10,7 +10,7 @@ This library extends the WordPress HTTP API with additional SSL options. It prov
 	[
 		'ssl_certificate'  => \ABSPATH . '/../private/your-certificate.pem',
 		'ssl_key'          => \ABSPATH . '/../private/your-key.pem',
-		'ssl_key_password' => ' your-password', 
+		'ssl_key_password' => 'your-password', 
 	]
 );
 ```
@@ -21,7 +21,7 @@ This library extends the WordPress HTTP API with additional SSL options. It prov
 	[
 		'ssl_certificate_blob' => '-----BEGIN CERTIFICATE-----', // Must be a full SSL certificate string.
 		'ssl_key_blob'         => '-----BEGIN ENCRYPTED PRIVATE KEY-----', // Must be a full SSL key string.
-		'ssl_key_password'     => ' your-password', 
+		'ssl_key_password'     => 'your-password', 
 	]
 );
 ```
