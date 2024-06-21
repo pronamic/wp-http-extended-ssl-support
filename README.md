@@ -36,6 +36,7 @@ It is good to realize that PHP and cURL can work with different TLS backends. No
 > 
 > option | BearSSL | GnuTLS | mbedTLS | OpenSSL | rustls | Schannel | Secure Transport | wolfSSL
 > -- | -- | -- | -- | -- | -- | -- | -- | --
+> `CURLOPT_KEYPASSWD` |   |   | ✔ | ✔ |   | ✔ |   | ✔
 > `CURLOPT_SSLCERT` |   | ✔ | ✔ | ✔ |   | ✔ | ✔ | ✔
 > `CURLOPT_SSLCERTTYPE` |   | ✔ | ✔ | ✔ |   | ✔ | ✔ | ✔
 > `CURLOPT_SSLCERT_BLOB` |   |   | ✔ | ✔ |   | ✔ | ✔ |  
