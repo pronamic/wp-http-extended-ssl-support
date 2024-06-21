@@ -24,6 +24,13 @@ final class Plugin {
 	private static $instance;
 
 	/**
+	 * Files.
+	 * 
+	 * @var array<string, string>
+	 */
+	private $files = [];
+
+	/**
 	 * Bootstrap.
 	 * 
 	 * @return void
@@ -56,6 +63,8 @@ final class Plugin {
 		}
 
 		\add_action( 'http_api_curl', [ $this, 'http_api_curl' ], 10, 2 );
+
+		\add_action( 'shutdown', [ $this, 'shutdown' ] );
 	}
 
 	/**
@@ -74,12 +83,56 @@ final class Plugin {
 	}
 
 	/**
+	 * Shutdown.
+	 * 
+	 * @link https://developer.wordpress.org/reference/hooks/shutdown/
+	 * @return void
+	 */
+	public function shutdown() {
+		\array_map( 'unlink', $this->files );
+	}
+
+	/**
+	 * Get temporary file.
+	 * 
+	 * @param string $content Content.
+	 * @return string
+	 * @throws \Exception Throws an exception if creating a temporary file for the content fails.
+	 */
+	private function get_temporary_file( $content ) {
+		$hash = \md5( $content );
+
+		if ( ! \array_key_exists( $hash, $this->files ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_tempnam -- Recommended function `get_temp_dir()` is used.
+			$file = \tempnam( \get_temp_dir(), 'pronamic_curl_ssl' );
+
+			if ( false === $file ) {
+				$exception = new \Exception( 'Failed to create a temporary file for SSL BLOB data.', 0, $error );
+
+				throw $exception;
+			}
+
+			// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_file_put_contents -- Allowed when using temporary file.
+			$result = \file_put_contents( $file, $content );
+
+			if ( false === $result ) {
+				$exception = new \Exception( 'Failed to write SSL BLOB data to temporary file.', 0, $error );
+
+				throw $exception;
+			}
+
+			$this->files[ $hash ] = $result;
+		}
+
+		return $this->files[ $hash ];
+	}
+
+	/**
 	 * Set SSL certificate BLOB option if needed.
 	 * 
 	 * @param CurlHandle            $handle      The cURL handle returned by curl_init() (passed by reference).
 	 * @param array<string, string> $parsed_args The HTTP request arguments.
 	 * @return void
-	 * @throws \Exception If the BLOB options is not supported and falling back to a temporary file fails.
 	 */
 	private function set_ssl_certificate_blob_option_if_needed( $handle, $parsed_args ) {
 		/**
@@ -98,26 +151,7 @@ final class Plugin {
 				 * @link https://curl.se/libcurl/c/tls-options.html
 				 * @link https://github.com/pronamic/wp-http-extended-ssl-support/issues/1
 				 */
-
-				// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_tempnam -- Recommended function `get_temp_dir()` is used.
-				$file = \tempnam( \get_temp_dir(), 'pronamic_curl_ssl_certificate' );
-
-				if ( false === $file ) {
-					$exception = new \Exception( 'Failed to create a temporary file for SSL certificate BLOB.', 0, $error );
-
-					throw $exception;
-				}
-
-				// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_file_put_contents -- Allowed when using temporary file.
-				$result = \file_put_contents( $file, $parsed_args['ssl_certificate_blob'] );
-
-				if ( false === $result ) {
-					$exception = new \Exception( 'Failed to write SSL certificate BLOB to temporary file.', 0, $error );
-
-					throw $exception;
-				}
-
-				$parsed_args['ssl_certificate'] = $file;
+				$parsed_args['ssl_certificate'] = $this->get_temporary_file( $parsed_args['ssl_certificate_blob'] );
 
 				$this->set_ssl_certificate_option_if_needed( $handle, $parsed_args );
 			}
@@ -149,40 +183,14 @@ final class Plugin {
 	 * @param CurlHandle            $handle      The cURL handle returned by curl_init() (passed by reference).
 	 * @param array<string, string> $parsed_args The HTTP request arguments.
 	 * @return void
-	 * @throws \Exception If the BLOB options is not supported and falling back to a temporary file fails.
 	 */
 	private function set_ssl_key_blob_option_if_needed( $handle, $parsed_args ) {
 		if ( \array_key_exists( 'ssl_key_blob', $parsed_args ) ) {
 			try {
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt -- WordPress requests library does not support this yet.
 				\curl_setopt( $handle, \CURLOPT_SSLKEY_BLOB, $parsed_args['ssl_key_blob'] );
-			} catch ( \ValueError $error ) {
-				/**
-				 * Not all TLS backends support BLOB, therefore we fall back on a SSL key file.
-				 * 
-				 * @link https://curl.se/libcurl/c/tls-options.html
-				 * @link https://github.com/pronamic/wp-http-extended-ssl-support/issues/1
-				 */
-
-				// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_tempnam -- Recommended function `get_temp_dir()` is used.
-				$file = \tempnam( \get_temp_dir(), 'pronamic_curl_ssl_key' );
-
-				if ( false === $file ) {
-					$exception = new \Exception( 'Failed to create temporary file for SSL key BLOB.', 0, $error );
-
-					throw $exception;
-				}
-
-				// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_file_put_contents -- Allowed when using temporary file. 
-				$result = \file_put_contents( $file, $parsed_args['ssl_certificate_blob'] );
-
-				if ( false === $result ) {
-					$exception = new \Exception( 'Failed to write SSL key BLOB to temporary file.', 0, $error );
-
-					throw $exception;
-				}
-
-				$parsed_args['ssl_key'] = $file;
+			} catch ( \ValueError $error ) {                
+				$parsed_args['ssl_key'] = $this->get_temporary_file( $parsed_args['ssl_key_blob'] );
 
 				$this->set_ssl_key_option_if_needed( $handle, $parsed_args );
 			}
