@@ -1,0 +1,8 @@
+{
+  "name": "@pronamic/wp-http-extended-ssl-support",
+  "version": "0.1.0",
+  "description": "This library extends the WordPress HTTP API with additional SSL options. It provides the option to pass the cURL options `CURLOPT_SSLCERT`, `CURLOPT_SSLKEY` and `CURLOPT_SSLKEYPASSWD` to requests.",
+  "keywords": [ "wordpress", "http", "ssl", "curl" ],
+  "author": "Pronamic",
+  "license": "GPL-2.0-or-later"
+}
